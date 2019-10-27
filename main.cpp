@@ -46,22 +46,23 @@ int main(int argc, char *argv[]) {
     Eigen::VectorXd evals = eigs.eigenvalues();
     Eigen::MatrixXd evecs = eigs.eigenvectors();
     fprintf(pFile, "\nConverged eigenvalues:\n");
-    for (int i = 0; i < nev; i++) {
+    for (int i = nev - 1; i >= 0; i--) { // ground state before excited states
         fprintf(pFile, "%11.7f  ", evals(i));
     }
     fprintf(pFile, "\n");
-    for (int i = 0; i < nev; i++) {
-      std::vector<size_t> indices;
+    for (int i = nev - 1; i >= 0; i--) {
+      std::vector<long int> indices;
       std::vector<double> values;
-      for (size_t j = 0; j < H_dim; j++) {
+      for (long int j = 0; j < H_dim; j++) {
         if (abs(evecs(j, i)) > 1e-4) {
           indices.push_back(j);
           values.push_back(evecs(j, i));
         }
       }
-      std::ofstream indices_file("indices"+std::to_string(i)+".dat", std::ofstream::binary);
+      int result_file_index = nev - 1 - i; // 0: ground state
+      std::ofstream indices_file("indices"+std::to_string(result_file_index)+".dat", std::ofstream::binary);
       hps::to_stream(indices, indices_file);
-      std::ofstream values_file("values"+std::to_string(i)+".dat", std::ofstream::binary);
+      std::ofstream values_file("values"+std::to_string(result_file_index)+".dat", std::ofstream::binary);
       hps::to_stream(values, values_file);
     }
   }
